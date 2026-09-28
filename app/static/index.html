@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buckleys UCP1D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <img src="buckleys-logo.png" alt="Buckleys — Manufacturers of Specialist Test Equipment" class="logo">
+    </div>
+    <div class="title">
+      <h1>Underwater Corrosion Probe</h1>
+      <div class="subtitle">UCP1D Digital Contact Probe</div>
+    </div>
+  </header>
+
+  <section class="statusbar">
+    <span class="pill"><span id="dot" class="dot"></span><span id="conn">Connecting…</span></span>
+    <span class="pill">Port <b id="st-port">–</b></span>
+    <span class="pill">Baud <b id="st-baud">–</b></span>
+    <span class="pill">Interval <b id="st-interval">–</b></span>
+    <span class="pill">Firmware <b id="st-fw">–</b></span>
+    <span class="pill">Log <b id="st-log">–</b></span>
+  </section>
+
+  <main>
+    <section class="readout">
+      <div class="label">Potential</div>
+      <div class="value"><span id="mv">–</span><span class="unit">mV</span></div>
+      <div class="meta" id="last-ts">No data yet</div>
+      <div class="meta">MCU temperature <b id="temp">–</b> °C</div>
+      <dl class="stats">
+        <dt>Window min</dt><dd id="s-min">–</dd>
+        <dt>Window max</dt><dd id="s-max">–</dd>
+        <dt>Window mean</dt><dd id="s-mean">–</dd>
+        <dt>Samples</dt><dd id="s-n">–</dd>
+      </dl>
+    </section>
+
+    <section class="chart-card">
+      <div class="chart-head">
+        <h2>Live potential</h2>
+        <div class="seg" id="window">
+          <button data-min="1">1 min</button>
+          <button data-min="5" class="on">5 min</button>
+          <button data-min="15">15 min</button>
+          <button data-min="60">60 min</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart" aria-label="Probe potential in millivolts over time" role="img"></canvas></div>
+    </section>
+
+    <section class="card">
+      <h2>Settings</h2>
+      <div class="grid">
+        <label>Serial port
+          <select id="port"></select>
+        </label>
+        <label>Baud rate
+          <select id="baud"></select>
+        </label>
+        <label>Output interval (ms)
+          <input id="interval" type="number" min="100" max="60000" step="100">
+        </label>
+        <div class="actions">
+          <button id="apply" class="primary">Apply</button>
+          <button id="refresh-ports">Rescan ports</button>
+        </div>
+      </div>
+      <div class="actions row">
+        <button id="log-toggle" class="primary">Stop logging</button>
+        <button id="read-temp">Read temperature</button>
+      </div>
+      <p class="note">Streaming uses <code>M3</code> (continuous output, millivolts) at the interval set with <code>IN</code>. Timestamps come from the BlueOS system clock; CSV files are in UTC, the graph shows this browser's local time.</p>
+    </section>
+
+    <section class="card">
+      <h2>Log files</h2>
+      <table class="files">
+        <thead><tr><th>File</th><th>Size</th><th>Modified</th><th></th></tr></thead>
+        <tbody id="files"><tr><td colspan="4" class="muted">No files yet</td></tr></tbody>
+      </table>
+    </section>
+
+    <details class="card">
+      <summary><h2>Advanced</h2></summary>
+      <div class="grid">
+        <label>Send ASCII command
+          <input id="cmd" type="text" placeholder="e.g. SW, TE, ME, M1" maxlength="64">
+        </label>
+        <div class="actions"><button id="send-cmd">Send</button></div>
+        <label>Set probe baud (<code>BD</code>)
+          <select id="probe-baud"></select>
+        </label>
+        <div class="actions"><button id="set-probe-baud" class="danger">Change probe baud</button></div>
+      </div>
+      <pre id="console" class="console"></pre>
+    </details>
+  </main>
+
+  <footer>Buckleys UCP1D BlueOS extension <span id="version"></span> · Wiring: Red +, Black −, Orange RS-485 A, Brown RS-485 B</footer>
+
+  <script src="vendor/chart.umd.min.js"></script>
+  <script src="vendor/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

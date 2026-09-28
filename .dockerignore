@@ -1,0 +1,6 @@
+.git
+.github
+data
+app/data
+**/__pycache__
+*.pdf
