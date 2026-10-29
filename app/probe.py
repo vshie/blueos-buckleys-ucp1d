@@ -133,6 +133,7 @@ class ProbeReader(threading.Thread):
         self._stop = threading.Event()
         self.state = {
             "connected": False,
+            "responding": False,  # True once any line has been received since connecting
             "port": None,
             "baud": settings["baud"],
             "interval_ms": settings["interval_ms"],
@@ -205,6 +206,8 @@ class ProbeReader(threading.Thread):
                 text = line.decode("ascii", errors="replace").strip()
                 if text:
                     self.on_console("rx", text)
+                    if not self.state["responding"]:
+                        self._update(responding=True)
                     return text
                 continue
             if time.monotonic() >= deadline:
@@ -251,7 +254,7 @@ class ProbeReader(threading.Thread):
             try:
                 port = self._open()
                 self._reconnect.clear()
-                self._update(connected=True, port=port, baud=self.settings["baud"], error=None)
+                self._update(connected=True, responding=False, port=port, baud=self.settings["baud"], error=None)
                 self._configure()
                 while not self._stop.is_set() and not self._reconnect.is_set():
                     try:
@@ -271,11 +274,11 @@ class ProbeReader(threading.Thread):
                     self.on_sample(sample)
             except Exception as e:
                 log.warning("Probe connection error: %s", e)
-                self._update(connected=False, error=str(e))
+                self._update(connected=False, responding=False, error=str(e))
             finally:
                 self._close()
             if self._reconnect.is_set():
                 self._reconnect.clear()
                 continue
-            self._update(connected=False)
+            self._update(connected=False, responding=False)
             self._stop.wait(RECONNECT_DELAY_S)

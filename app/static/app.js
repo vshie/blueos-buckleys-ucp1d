@@ -163,8 +163,11 @@ function updateStats(from) {
 function renderStatus(s) {
   lastStatus = s;
   const dot = $("dot");
-  dot.className = "dot " + (s.connected ? "ok" : "err");
-  $("conn").textContent = s.connected ? (s.simulated ? "Connected (simulated)" : "Connected") : (s.error ? `Disconnected: ${s.error}` : "Disconnected");
+  const silent = s.connected && !s.responding;
+  dot.className = "dot " + (silent ? "warn" : s.connected ? "ok" : "err");
+  $("conn").textContent = silent ? "Port open, no response from probe"
+    : s.connected ? (s.simulated ? "Connected (simulated)" : "Connected")
+    : (s.error ? `Disconnected: ${s.error}` : "Disconnected");
   $("st-port").textContent = s.port || s.settings.port;
   $("st-baud").textContent = s.baud || s.settings.baud;
   $("st-interval").textContent = `${s.interval_ms || s.settings.interval_ms} ms`;
