@@ -86,6 +86,31 @@ In BlueOS go to **Extensions → Installed → +** and enter:
 - Extension name: `Buckleys UCP1D`
 - Docker image: `<DOCKER_USERNAME>/blueos-buckleys-ucp1d`
 - Docker tag: `main` (or a release tag)
-- Custom settings: paste the `permissions` JSON from the Dockerfile label
+- Custom settings: paste the JSON below (this is the Dockerfile's `permissions` label with `$IMAGE_NAME` filled in)
+
+```json
+{
+  "ExposedPorts": {
+    "8000/tcp": {}
+  },
+  "HostConfig": {
+    "Privileged": true,
+    "Binds": [
+      "/usr/blueos/extensions/buckleys-ucp1d:/app/data",
+      "/dev:/dev"
+    ],
+    "ExtraHosts": ["host.docker.internal:host-gateway"],
+    "PortBindings": {
+      "8000/tcp": [
+        {
+          "HostPort": ""
+        }
+      ]
+    }
+  }
+}
+```
+
+If you set a different `IMAGE_NAME` variable, change `buckleys-ucp1d` in the first bind path to match.
 
 The container runs privileged with `/dev` bind-mounted, so an adapter plugged in after the extension starts is still found.
